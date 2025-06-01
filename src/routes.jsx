@@ -6,6 +6,8 @@ import Shop from "./pages/shop/Shop";
 import Reigster from "./pages/register/Reigster";
 import Login from "./pages/login/Login";
 import Cart from "./pages/cart/Cart";
+import ForgetPassword from "./pages/forgentpassworld/Forgetpassworld";
+import Restcode from "./pages/forgentpassworld/Restcode";
 
 const route = createBrowserRouter([
   {
@@ -22,7 +24,7 @@ const route = createBrowserRouter([
         element: <Shop/>,
       },
         {
-        path: '/Reg',
+        path: '/register',
         element: <Reigster/>,
       },
         {
@@ -32,6 +34,14 @@ const route = createBrowserRouter([
        {
         path: '/cart',
         element:<Cart/>
+      },
+       {
+        path: '/forgetpassworld',
+        element:<ForgetPassword/>
+      },
+       {
+        path: '/restcode',
+        element:<Restcode/>
       },
     ],
   },
