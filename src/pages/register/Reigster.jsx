@@ -11,7 +11,7 @@ function Register() {
   const { register, handleSubmit } = useForm();
 
   const registeruser =  async(value) => {
-    const response= await axios.post(`http://mytshop.runasp.net/api/Account/register`,value);
+    const response= await axios.post(`https://mytshop.runasp.net/api/Account/register`,value);
     console.log(response);
   };
 

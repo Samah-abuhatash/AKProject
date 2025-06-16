@@ -1,9 +1,16 @@
 import React from 'react'
+import Catgorey from '../../components/catgorey/Catgorey'
+import Proudct from '../../components/proudct/Proudct';
+
 
 function Home() {
   return (
-    <div>Home</div>
+    <>
+      <Catgorey/>
+  <Proudct/>
+    </>
+  
   )
 }
 
-export default Home
+export default Home;

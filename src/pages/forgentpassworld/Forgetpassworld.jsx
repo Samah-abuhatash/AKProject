@@ -14,7 +14,8 @@ function Forgetpassworld() {
 
   const forgetpassworldUser = async (value) => {
     try {
-      const response = await axios.post(`http://mytshop.runasp.net/api/Account/ForgotPassword`, value);
+      const response = await axios.post(`https://mytshop.runasp.net/api/Account/ForgotPassword`, value);
+    console.log(response);
       if(response.status==200){
         navgate("/restcode");
 

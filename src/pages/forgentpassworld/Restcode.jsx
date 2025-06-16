@@ -10,8 +10,11 @@ function Restcode() {
 
   const sendcoduser =  async(value) => {
     try{
-    const response= await axios.post(`http//:mytshop.runasp.net/api/Account/SendCode`,value);
-    
+const response = await axios.patch(
+  'https://mytshop.runasp.net/api/Account/SendCode',
+  value
+);
+    console.log(response);
     console.log("sucesscode");
   }
     catch(e){
@@ -31,6 +34,17 @@ function Restcode() {
 
 
       <TextField
+      /* بكل بساطة:
+
+`{...register('name', { required: true })}`
+
+**تربط** حقل الإدخال (input) مع نظام التحكم في الفورم، بحيث:
+
+1. تخزن القيمة اللي المستخدم بيكتبها في هذا الحقل تحت اسم "name".
+2. تتحقق إنه المستخدم ما يترك الحقل فاضي (لأنه مطلوب).
+
+يعني، هي الطريقة اللي الفورم يعرف البيانات اللي بتدخلها ويتابعها ويشوف إذا كلها صحيحة قبل الإرسال.
+*/ 
         {...register('email')}
         label="Email"
         type="email"

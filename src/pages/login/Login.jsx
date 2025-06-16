@@ -12,8 +12,10 @@ function Login() {
 
   const loginUser = async (value) => {
     try {
-      const response = await axios.post(`http://mytshop.runasp.net/api/Account/Login`, value);
+      const response = await axios.post(`https://mytshop.runasp.net/api/Account/Login`, value);
       console.log("Login successful:", response.data);
+         localStorage.setItem("userToken", response.data.token);
+
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
     }
