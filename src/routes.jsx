@@ -8,8 +8,9 @@ import Login from "./pages/login/Login";
 import Cart from "./pages/cart/Cart";
 import ForgetPassword from "./pages/forgentpassworld/Forgetpassworld";
 import Restcode from "./pages/forgentpassworld/Restcode";
-import Detlisp from "./pages/Deatilesproudct.jsx/Proudct";
-import Proudct from "./pages/Deatilesproudct.jsx/Proudct";
+
+import Checkout from "./pages/checkout/Checkout";
+import Product from "./pages/Deatilesproudct/Proudct";
 
 const route = createBrowserRouter([
   {
@@ -24,7 +25,7 @@ const route = createBrowserRouter([
       ,
        {
         path: '/product/:id',
-        element:<Proudct/>
+        element:<Product/>
       },
         {
         path: '/shop',
@@ -33,6 +34,11 @@ const route = createBrowserRouter([
         {
         path: '/register',
         element: <Reigster/>,
+      },
+      ,
+        {
+        path: '/checkout',
+        element: <Checkout/>,
       },
         {
         path: '/login',

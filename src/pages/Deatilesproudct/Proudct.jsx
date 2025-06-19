@@ -53,11 +53,11 @@ function Product() {
 
   useEffect(() => {
     getProduct();
-  }, [id]); // Re-fetch if ID changes
-
-  if (isLoading) {
+  }, []); // Re-fetch if ID changes
+if (isLoading) {
     return <Loader />;
   }
+  
 
   if (!product) {
     return <Typography color="error">Failed to load product.</Typography>;

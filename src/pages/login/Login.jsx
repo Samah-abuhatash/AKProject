@@ -5,16 +5,18 @@ import style from './login.module.css';
 import { AccountCircle, Lock, Email } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
-
+const navgate=useNavigate();
   const loginUser = async (value) => {
     try {
       const response = await axios.post(`https://mytshop.runasp.net/api/Account/Login`, value);
       console.log("Login successful:", response.data);
          localStorage.setItem("userToken", response.data.token);
+         navgate('/');
+
 
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);

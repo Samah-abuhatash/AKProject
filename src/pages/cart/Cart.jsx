@@ -2,9 +2,14 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Box, Grid, Typography, Card, CardContent, CardMedia, IconButton, Button } from '@mui/material';
 import { Remove, AddCircle, Delete } from '@mui/icons-material';
+import { Link } from 'react-router';
 
 function Cart() {
   const [products, setProducts] = useState([]);
+   const [totalPrice, setTotalPrice] = useState(0);
+    const [toatlitem, settoatlitem] = useState(0); 
+    let test=0; // تم التصحيح هنا
+
 
   // جلب محتويات السلة
   const fetchCart = async () => {
@@ -17,6 +22,16 @@ function Cart() {
         }
       );
       setProducts(response.data.cartResponse || []);
+      setTotalPrice(response.data.totalPrice);
+     
+      response.data.cartResponse.forEach(product => {
+       test=test+product.count;
+
+        
+      });
+      settoatlitem(test);
+      console.log(toatlitem);
+
     } catch (error) {
       console.error('Error fetching cart:', error);
     }
@@ -143,10 +158,18 @@ function Cart() {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Typography variant='h5' gutterBottom>Order Summary</Typography>
+          <Card sx={{p:2}}>
+            <Typography variant='h5' gutterBottom>Order Summary</Typography>
           <Typography variant='body1'>
-            Total: ${products.reduce((total, p) => total + p.price * p.count, 0).toFixed(2)}
+            Total:{totalPrice}$
           </Typography>
+           <Typography variant='body1'>
+            numberofitem:{toatlitem}
+          </Typography>
+          
+          </Card>
+          <Button  variant="contained"
+                  color="primary" fullWidth component={Link}to='/checkout'>Check out:</Button>
         </Grid>
       </Grid>
     </Box>
