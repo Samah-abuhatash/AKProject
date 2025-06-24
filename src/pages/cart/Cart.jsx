@@ -1,17 +1,19 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { Box, Grid, Typography, Card, CardContent, CardMedia, IconButton, Button } from '@mui/material';
+import React, { useEffect, useState, useContext } from 'react';
+import {
+  Box, Grid, Typography, Card, CardContent, CardMedia,
+  IconButton, Button
+} from '@mui/material';
 import { Remove, AddCircle, Delete } from '@mui/icons-material';
 import { Link } from 'react-router';
+import { Cartcontext } from '../../components/context/Cartcontext';
 
 function Cart() {
   const [products, setProducts] = useState([]);
-   const [totalPrice, setTotalPrice] = useState(0);
-    const [toatlitem, settoatlitem] = useState(0); 
-    let test=0; // تم التصحيح هنا
+  const [totalPrice, setTotalPrice] = useState(0);
+  const { cartitem, setcartitem } = useContext(Cartcontext);
 
-
-  // جلب محتويات السلة
+  // ✅ جلب محتويات السلة وتحديث العدد والسعر
   const fetchCart = async () => {
     try {
       const userToken = localStorage.getItem("userToken");
@@ -21,23 +23,20 @@ function Cart() {
           headers: { Authorization: `Bearer ${userToken}` }
         }
       );
-      setProducts(response.data.cartResponse || []);
-      setTotalPrice(response.data.totalPrice);
-     
-      response.data.cartResponse.forEach(product => {
-       test=test+product.count;
 
-        
-      });
-      settoatlitem(test);
-      console.log(toatlitem);
+      const cartItems = response.data.cartResponse || [];
+      setProducts(cartItems);
+      setTotalPrice(response.data.totalPrice);
+
+      const totalItemCount = cartItems.reduce((sum, item) => sum + item.count, 0);
+      setcartitem(totalItemCount); 
 
     } catch (error) {
       console.error('Error fetching cart:', error);
     }
   };
 
-  // زيادة كمية منتج
+  // ✅ زيادة الكمية
   const increasqunt = async (id) => {
     try {
       const userToken = localStorage.getItem("userToken");
@@ -52,7 +51,7 @@ function Cart() {
     }
   };
 
-  // نقصان كمية منتج أو حذفه إذا الكمية 1
+  // ✅ نقصان الكمية أو حذف المنتج إذا كانت الكمية 1
   const decqunt = async (id) => {
     try {
       const userToken = localStorage.getItem("userToken");
@@ -77,38 +76,36 @@ function Cart() {
     }
   };
 
-  // حذف منتج من السلة
+  // ✅ حذف منتج بشكل كامل من السلة
   const deleteProduct = async (id) => {
     try {
       const userToken = localStorage.getItem("userToken");
       await axios.delete(
-        `https://mytshop.runasp.net/api/Carts/removeItem/${id}`,
+        `https://mytshop.runasp.net/api/Carts/${id}`,
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
-      fetchCart();
+      fetchCart(); // لا داعي لتعديل cartitem يدوياً، لأنه يتم تحديثه من fetchCart
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
 
-  // مسح السلة كاملة - تأكد من مسار الـ API الصحيح هنا!
+  // ✅ مسح السلة كاملة
   const clearCart = async () => {
     try {
-      const userToken = localStorage.getItem('userToken');
-      const response = await axios.delete(
-        'https://mytshop.runasp.net/api/Carts/clearCart', // جرب هذا المسار أو بدّل حسب التوثيق الصحيح
+      const userToken = localStorage.getItem("userToken");
+      await axios.delete(
+        'https://mytshop.runasp.net/api/Carts/clearCart',
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
-      console.log("Cart cleared:", response.data);
       alert("Cart cleared successfully!");
-      setProducts([]); // تحديث الواجهة بعد المسح
+      fetchCart();
     } catch (error) {
       console.error("Error clearing cart:", error.response?.data || error.message);
       alert("Failed to clear cart");
     }
   };
 
-  // تحميل السلة أول مرة
   useEffect(() => {
     fetchCart();
   }, []);
@@ -158,18 +155,26 @@ function Cart() {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Card sx={{p:2}}>
+          <Card sx={{ p: 2 }}>
             <Typography variant='h5' gutterBottom>Order Summary</Typography>
-          <Typography variant='body1'>
-            Total:{totalPrice}$
-          </Typography>
-           <Typography variant='body1'>
-            numberofitem:{toatlitem}
-          </Typography>
-          
+            <Typography variant='body1'>
+              Total: ${totalPrice}
+            </Typography>
+            <Typography variant='body1'>
+              Number of items: {cartitem}
+            </Typography>
           </Card>
-          <Button  variant="contained"
-                  color="primary" fullWidth component={Link}to='/checkout'>Check out:</Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            component={Link}
+            to="/checkout"
+            sx={{ mt: 2 }}
+          >
+            Check Out
+          </Button>
         </Grid>
       </Grid>
     </Box>

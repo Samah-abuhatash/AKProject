@@ -11,11 +11,15 @@ import {
   Button,
   Box,
 } from '@mui/material';
+import { useContext } from 'react';
+import { Cartcontext } from '../../components/context/Cartcontext.jsx';
+
 
 function Product() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [isLoading, setLoading] = useState(true);
+   const { cartitem,setcartitem} = React.useContext(Cartcontext);
 
   const getProduct = async () => {
     try {
@@ -44,8 +48,9 @@ function Product() {
         }
       }
     );
-
+setcartitem(cartitem+1);
     console.log(response);
+
   } catch (error) {
     console.error("Error adding to cart:", error.response?.data || error.message);
   }

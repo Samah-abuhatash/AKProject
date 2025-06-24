@@ -10,7 +10,7 @@ import {
   Container,
   CardMedia,
 } from '@mui/material';
-import { Link } from 'react-router-dom';  
+import { Link } from 'react-router-dom'; 
 
 function Product() {
   const [products, setProducts] = useState([]);

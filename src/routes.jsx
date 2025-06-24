@@ -11,6 +11,7 @@ import Restcode from "./pages/forgentpassworld/Restcode";
 
 import Checkout from "./pages/checkout/Checkout";
 import Product from "./pages/Deatilesproudct/Proudct";
+import Protectedrouter from "./components/protectedrouter/Protectedrouter";
 
 const route = createBrowserRouter([
   {
@@ -38,7 +39,11 @@ const route = createBrowserRouter([
       ,
         {
         path: '/checkout',
-        element: <Checkout/>,
+        element:
+         <Protectedrouter>
+          <Checkout/>,
+         </Protectedrouter> 
+       
       },
         {
         path: '/login',
@@ -46,7 +51,11 @@ const route = createBrowserRouter([
       },
        {
         path: '/cart',
-        element:<Cart/>
+        element:
+        <Protectedrouter>
+         <Cart/>
+        </Protectedrouter>
+       
       },
        {
         path: '/forgetpassworld',

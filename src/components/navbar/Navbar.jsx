@@ -12,33 +12,25 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { Link, useNavigate } from 'react-router-dom'; // ✅ المصحح
+import { Link, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { Cartcontext } from '../context/Cartcontext'; 
 
 const pagesGuest = ['register', 'login'];
 const pagesAuth = ['cart'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function Navbar() {
+  const { cartitem } =React.useContext(Cartcontext);
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const isLogin = Boolean(localStorage.getItem('userToken'));
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // ✅ داخل الدالة
-
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
+  const handleOpenUserMenu = (event) => setAnchorElUser(eveuseContextnt.currentTarget);
+  const handleCloseNavMenu = () => setAnchorElNav(null);
+  const handleCloseUserMenu = () => setAnchorElUser(null);
 
   const handleLogout = () => {
     localStorage.removeItem('userToken');
@@ -69,11 +61,7 @@ function Navbar() {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
+            <IconButton size="large" onClick={handleOpenNavMenu} color="inherit">
               <MenuIcon />
             </IconButton>
             <Menu
@@ -83,13 +71,10 @@ function Navbar() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {(isLogin ? pagesAuth : pagesGuest).map((page) => (
-                <MenuItem
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  component={Link}
-                  to={`/${page}`}
-                >
-                  <Typography textAlign="center">{page}</Typography>
+                <MenuItem key={page} onClick={handleCloseNavMenu} component={Link} to={`/${page}`}>
+                  <Typography textAlign="center">
+                    {page === 'cart' ? `Cart(${cartitem})` : page}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -124,7 +109,7 @@ function Navbar() {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {page === 'cart' ? `Cart(${cartitem})` : page}
               </Button>
             ))}
             {isLogin && (
@@ -137,7 +122,7 @@ function Navbar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="User" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu

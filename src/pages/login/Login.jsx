@@ -1,25 +1,61 @@
 import { Box, Button, InputAdornment, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import style from './login.module.css';
 
 import { AccountCircle, Lock, Email } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router';
+import { toast,Slide , Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+/* mode:'onChange'} هاي معناها انا اجواها اعطني ايرور &&blur يس اخلص اعطني ايرور */
+/*valdtion  {...register('email', { required: 'Email is required' })}
+ايرور يظهر ممكن طريقتين :
+a-        helperText={errors.email?.message}
+b- {errors.email?<p>
+        Email is required
+      </p>:null}
 
+ */
 function Login() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm({mode:'onChange'} );
+  const[loading ,setloading]=useState(false);
 const navgate=useNavigate();
   const loginUser = async (value) => {
     try {
+      setloading(true);
       const response = await axios.post(`https://mytshop.runasp.net/api/Account/Login`, value);
       console.log("Login successful:", response.data);
          localStorage.setItem("userToken", response.data.token);
          navgate('/');
-
+toast.success('Login successful:', {
+position: "top-right",
+autoClose: 5000,
+hideProgressBar: false,
+closeOnClick: false,
+pauseOnHover: true,
+draggable: true,
+progress: undefined,
+theme: "dark",
+transition: Bounce,
+});
 
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
+      toast.error('Login failed:', {
+position: "top-right",
+autoClose: 5000,
+hideProgressBar: false,
+closeOnClick: false,
+pauseOnHover: true,
+draggable: true,
+progress: undefined,
+theme: "dark",
+transition: Bounce,
+});
+    }
+    finally{
+      setloading(false);
     }
   };
 
@@ -45,6 +81,7 @@ const navgate=useNavigate();
           ),
         }}
       />
+      
       <TextField
         {...register('password', { required: 'Password is required' })}
         label="Password"
@@ -61,8 +98,10 @@ const navgate=useNavigate();
           ),
         }}
       />
-      <Button variant="outlined" type="submit">
-        Login
+       
+      <Button variant="outlined" type="submit" disabled={loading}>
+        {loading ? 'loading ...' :'login'} 
+      
       </Button>
       <Typography variant="body2">
               <Link
