@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import {
   Button,
@@ -9,24 +9,21 @@ import {
   Grid,
   Container,
   CardMedia,
+  CircularProgress,
 } from '@mui/material';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
+import Usefetch from '../../hook/Usefetch';
+import Loader from '../shared/Loader';
 
 function Product() {
-  const [products, setProducts] = useState([]);
+  const { Data, Erorr, Isloader } = Usefetch(`https://mytshop.runasp.net/api/products`);
 
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get('https://mytshop.runasp.net/api/products');
-      setProducts(response.data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
+  if (Erorr) return <p>Error: {Erorr.message}</p>;
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  if (Isloader)
+    return (
+     <Loader/>
+    );
 
   return (
     <Container sx={{ py: 4 }}>
@@ -34,7 +31,7 @@ function Product() {
         🛍️ Product Categories
       </Typography>
       <Grid container spacing={3}>
-        {products.map((product) => (
+        {Data.map((product) => (
           <Grid item xs={12} sm={6} md={4} key={product.id}>
             <Card
               sx={{
@@ -52,7 +49,7 @@ function Product() {
             >
               <CardMedia
                 component="img"
-                image={product.mainImg}
+                image={product.mainImg || 'https://via.placeholder.com/300x200'}
                 alt={product.name}
               />
               <CardContent sx={{ flexGrow: 1 }}>
@@ -60,7 +57,7 @@ function Product() {
                   📦 {product.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  This is a short description about the product. You can customize it.
+                  This is a short description about the product.
                 </Typography>
               </CardContent>
               <CardActions>
