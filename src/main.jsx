@@ -5,12 +5,15 @@ import App from './App.jsx'
   import { ToastContainer} from 'react-toastify';
 
 import './index.css'
+import ThemeContextProvider from './components/context/Themecontext.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-              <CssBaseline />
-              <ToastContainer/>
+  <>
+  <ThemeContextProvider>
+    <App/>
+    <ToastContainer/>
 
-  </StrictMode>,
+  </ThemeContextProvider>
+  </>
+ 
 )

@@ -35,8 +35,6 @@ function Cart() {
       console.error('Error fetching cart:', error);
     }
   };
-
-  // ✅ زيادة الكمية
   const increasqunt = async (id) => {
     try {
       const userToken = localStorage.getItem("userToken");
@@ -84,13 +82,13 @@ function Cart() {
         `https://mytshop.runasp.net/api/Carts/${id}`,
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
-      fetchCart(); // لا داعي لتعديل cartitem يدوياً، لأنه يتم تحديثه من fetchCart
+      fetchCart(); 
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
 
-  // ✅ مسح السلة كاملة
+  
   const clearCart = async () => {
     try {
       const userToken = localStorage.getItem("userToken");

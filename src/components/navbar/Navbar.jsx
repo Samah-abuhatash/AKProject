@@ -11,125 +11,195 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { Cartcontext } from '../context/Cartcontext'; 
+import { DarkMode, LightMode } from '@mui/icons-material';
+import { ThemeContextCustom } from '../context/Themecontext';
+import logo from '../../assets/images/logo/logo1.png';
 
-const pagesGuest = ['register', 'login'];
+const pagesGuest = ['login', 'register'];
 const pagesAuth = ['cart'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-function Navbar() {
-  const { cartitem } =React.useContext(Cartcontext);
+export default function Navbar() {
+  const { cartitem } = useContext(Cartcontext);
+  const { toggleTheme, mode } = useContext(ThemeContextCustom);
+
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+
   const isLogin = Boolean(localStorage.getItem('userToken'));
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
-  const handleOpenUserMenu = (event) => setAnchorElUser(eveuseContextnt.currentTarget);
   const handleCloseNavMenu = () => setAnchorElNav(null);
+
+  const handleOpenUserMenu = (event) => setAnchorElUser(event.currentTarget);
   const handleCloseUserMenu = () => setAnchorElUser(null);
 
   const handleLogout = () => {
     localStorage.removeItem('userToken');
     navigate('/login');
+    handleCloseUserMenu();
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ backgroundColor: '#4FC4CA' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
+
+          {/* Logo Desktop */}
+          <Box
             component={Link}
             to="/"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
+              alignItems: 'center',
             }}
           >
-            LOGO
-          </Typography>
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ height: 40, filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.5))' }}
+            />
+          </Box>
 
+          {/* Mobile Menu Icon */}
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton size="large" onClick={handleOpenNavMenu} color="inherit">
+            <IconButton
+              size="large"
+              onClick={handleOpenNavMenu}
+              color="inherit"
+              aria-label="open navigation menu"
+            >
               <MenuIcon />
             </IconButton>
             <Menu
               anchorEl={anchorElNav}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
+              keepMounted
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {(isLogin ? pagesAuth : pagesGuest).map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu} component={Link} to={`/${page}`}>
-                  <Typography textAlign="center">
-                    {page === 'cart' ? `Cart(${cartitem})` : page}
-                  </Typography>
-                </MenuItem>
-              ))}
+              {(isLogin ? [...pagesAuth, 'logout'] : pagesGuest).map((page) => {
+                if (page === 'logout') {
+                  return (
+                    <MenuItem
+                      key={page}
+                      onClick={() => {
+                        handleLogout();
+                        handleCloseNavMenu();
+                      }}
+                    >
+                      <Typography textAlign="center">Logout</Typography>
+                    </MenuItem>
+                  );
+                }
+                const path = `/${page}`;
+                return (
+                  <MenuItem key={page} component={Link} to={path} onClick={handleCloseNavMenu}>
+                    <Typography textAlign="center">
+                      {page === 'cart' ? `Cart (${cartitem})` : page.charAt(0).toUpperCase() + page.slice(1)}
+                    </Typography>
+                  </MenuItem>
+                );
+              })}
             </Menu>
           </Box>
 
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
+          {/* Logo Mobile */}
+          <Box
             component={Link}
             to="/"
             sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
+              display: { xs: 'flex', md: 'none' },
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            LOGO
-          </Typography>
-
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {(isLogin ? pagesAuth : pagesGuest).map((page) => (
-              <Button
-                key={page}
-                component={Link}
-                to={`/${page}`}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page === 'cart' ? `Cart(${cartitem})` : page}
-              </Button>
-            ))}
-            {isLogin && (
-              <Button onClick={handleLogout} sx={{ color: 'white' }}>
-                Logout
-              </Button>
-            )}
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ height: 40, filter: 'drop-shadow(0 0 3px rgba(0,0,0,0.5))' }}
+            />
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
+          {/* Desktop Buttons (Login/Register or Cart/Logout) */}
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>
+            {!isLogin ? (
+              <>
+                <Button
+                  component={Link}
+                  to="/login"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: 'white',
+                    color: '#4FC4CA',
+                    fontWeight: 'bold',
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: '#e0f7f9' },
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  component={Link}
+                  to="/register"
+                  variant="outlined"
+                  sx={{
+                    borderColor: 'white',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    textTransform: 'none',
+                    '&:hover': { backgroundColor: 'white', color: '#4FC4CA' },
+                  }}
+                >
+                  Register
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  component={Link}
+                  to="/cart"
+                  variant="outlined"
+                  sx={{ color: 'white', borderColor: 'white', textTransform: 'none', fontWeight: 'bold' }}
+                >
+                  Cart ({cartitem})
+                </Button>
+
+                <Button
+                  onClick={handleLogout}
+                  variant="outlined"
+                  sx={{ color: 'white', borderColor: 'white', textTransform: 'none', fontWeight: 'bold' }}
+                >
+                  Logout
+                </Button>
+              </>
+            )}
+
+            {/* Theme Toggle */}
+            <Tooltip title="Toggle Theme">
+              <IconButton onClick={toggleTheme} color="inherit" aria-label="toggle theme">
+                {mode === 'light' ? <DarkMode /> : <LightMode />}
+              </IconButton>
+            </Tooltip>
+
+            {/* User Avatar and Menu */}
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="User" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
+
             <Menu
-              sx={{ mt: '45px' }}
               anchorEl={anchorElUser}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
+              sx={{ mt: '45px' }}
             >
               {settings.map((setting) => (
                 <MenuItem
@@ -149,5 +219,3 @@ function Navbar() {
     </AppBar>
   );
 }
-
-export default Navbar;
