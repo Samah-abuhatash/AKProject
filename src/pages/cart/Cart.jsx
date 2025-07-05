@@ -1,5 +1,5 @@
-import axios from 'axios';
 import React, { useEffect, useState, useContext } from 'react';
+//import axiosaut from '../../api/axiosaut'; // مسار الملف اللي حفظته فيه
 import {
   Box, Grid, Typography, Card, CardContent, CardMedia,
   IconButton, Button
@@ -7,66 +7,44 @@ import {
 import { Remove, AddCircle, Delete } from '@mui/icons-material';
 import { Link } from 'react-router';
 import { Cartcontext } from '../../components/context/Cartcontext';
+import axiosaut from '../../api/AxoisAuth.jsx';
 
 function Cart() {
   const [products, setProducts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const { cartitem, setcartitem } = useContext(Cartcontext);
 
-  // ✅ جلب محتويات السلة وتحديث العدد والسعر
   const fetchCart = async () => {
     try {
-      const userToken = localStorage.getItem("userToken");
-      const response = await axios.get(
-        'https://mytshop.runasp.net/api/Carts',
-        {
-          headers: { Authorization: `Bearer ${userToken}` }
-        }
-      );
-
+      const response = await axiosaut.get('/Carts');
       const cartItems = response.data.cartResponse || [];
       setProducts(cartItems);
       setTotalPrice(response.data.totalPrice);
-
       const totalItemCount = cartItems.reduce((sum, item) => sum + item.count, 0);
-      setcartitem(totalItemCount); 
-
+      setcartitem(totalItemCount);
     } catch (error) {
       console.error('Error fetching cart:', error);
     }
   };
+
   const increasqunt = async (id) => {
     try {
-      const userToken = localStorage.getItem("userToken");
-      await axios.patch(
-        `https://mytshop.runasp.net/api/Carts/increaseCount/${id}`,
-        {},
-        { headers: { Authorization: `Bearer ${userToken}` } }
-      );
+      await axiosaut.patch(`Carts/increaseCount/${id}`);
       fetchCart();
     } catch (error) {
       console.error("Error increasing quantity:", error);
     }
   };
 
-  // ✅ نقصان الكمية أو حذف المنتج إذا كانت الكمية 1
   const decqunt = async (id) => {
     try {
-      const userToken = localStorage.getItem("userToken");
       const product = products.find(p => p.id === id);
       if (!product) return;
 
       if (product.count > 1) {
-        await axios.patch(
-          `https://mytshop.runasp.net/api/Carts/decreaseCount/${id}`,
-          {},
-          { headers: { Authorization: `Bearer ${userToken}` } }
-        );
+        await axiosaut.patch(`Carts/decreaseCount/${id}`);
       } else {
-        await axios.delete(
-          `https://mytshop.runasp.net/api/Carts/${id}`,
-          { headers: { Authorization: `Bearer ${userToken}` } }
-        );
+        await axiosaut.delete(`Carts/${id}`);
       }
       fetchCart();
     } catch (error) {
@@ -74,28 +52,18 @@ function Cart() {
     }
   };
 
-  // ✅ حذف منتج بشكل كامل من السلة
   const deleteProduct = async (id) => {
     try {
-      const userToken = localStorage.getItem("userToken");
-      await axios.delete(
-        `https://mytshop.runasp.net/api/Carts/${id}`,
-        { headers: { Authorization: `Bearer ${userToken}` } }
-      );
-      fetchCart(); 
+      await axiosaut.delete(`Carts/${id}`);
+      fetchCart();
     } catch (error) {
       console.error("Error deleting item:", error);
     }
   };
 
-  
   const clearCart = async () => {
     try {
-      const userToken = localStorage.getItem("userToken");
-      await axios.delete(
-        'https://mytshop.runasp.net/api/Carts/clearCart',
-        { headers: { Authorization: `Bearer ${userToken}` } }
-      );
+      await axiosaut.delete('Carts/clearCart');
       alert("Cart cleared successfully!");
       fetchCart();
     } catch (error) {
@@ -170,6 +138,7 @@ function Cart() {
             component={Link}
             to="/checkout"
             sx={{ mt: 2 }}
+            disabled={products.length === 0}
           >
             Check Out
           </Button>

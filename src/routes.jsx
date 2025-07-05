@@ -12,6 +12,13 @@ import Restcode from "./pages/forgentpassworld/Restcode";
 import Checkout from "./pages/checkout/Checkout";
 import Product from "./pages/Deatilesproudct/Proudct";
 import Protectedrouter from "./components/protectedrouter/Protectedrouter";
+import Homepage from "./pages/Homepage/Homepage";
+import Categoriespages from "./pages/categories/Categoriespages";
+import Proudctpages from "./pages/proudct/Proudctpages";
+import { ContactPage } from "@mui/icons-material";
+import Contactuspages from "./pages/contactus/Contactuspages";
+import Aboutuspages from "./pages/aboutus/Aboutuspages";
+
 
 const route = createBrowserRouter([
   {
@@ -65,8 +72,26 @@ const route = createBrowserRouter([
         path: '/restcode',
         element:<Restcode/>
       },
-    
-    
+     {
+        path: '/home',
+        element: <Homepage/>,
+      },
+    {
+        path: '/categories',
+        element: < Categoriespages/>,
+      },
+      {
+        path: '/products',
+        element: <Proudctpages/>,
+      },
+       {
+        path: '/aboutus',
+        element: <Aboutuspages/>,
+      },
+       {
+        path: '/contactus',
+        element: <Contactuspages/>,
+      },
     ],
     
     

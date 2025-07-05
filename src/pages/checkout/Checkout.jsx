@@ -27,10 +27,11 @@ const handelpaymentMethod = (event) => {
        window.location.href= response.data.url
       }
   
-    } catch (error) {
-      console.error("Error during payment:", error.response?.data || error.message);
-      alert("Payment failed: " + (error.response?.data || error.message));
-    }
+    }catch (error) {
+  console.error("Error during payment:", error.response?.data || error.message);
+  alert("Payment failed: " + (error.response?.data?.message || error.message));
+}
+
   };
 
   return (
