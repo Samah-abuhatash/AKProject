@@ -23,7 +23,16 @@ import { ThemeContextCustom } from "../context/Themecontext";
 import { Cartcontext } from "../context/Cartcontext";
 import logo from "../../assets/images/logo/logo1.png";
 
-const guestPages = ["Home", "Categories", "Products", "About Us", "Contact Us", "Login", "Register"];
+// ✅ كلا القائمتين بصيغة name + path
+const guestPages = [
+  { name: "Home", path: "/" },
+  { name: "Categories", path: "/categories" },
+  { name: "Products", path: "/products" },
+  { name: "About Us", path: "/aboutus" },
+  { name: "Contact Us", path: "/contactus" },
+  { name: "Login", path: "/login" },
+  { name: "Register", path: "/register" },
+];
 
 const authPages = [
   { name: "Home", path: "/" },
@@ -34,7 +43,7 @@ const authPages = [
   { name: "Cart", path: "/cart" },
 ];
 
-// Sidebar items بدون path
+// Sidebar items
 const sidebarSettings = [
   { name: "Info" },
   { name: "Change Password" },
@@ -64,7 +73,6 @@ export default function Navbar() {
     setIsSidebarOpen((prev) => !prev);
   };
 
-  // دالة للتنقل حسب اسم العنصر في السايدبار
   const handleSidebarNavigation = (name) => {
     switch (name) {
       case "Info":
@@ -85,13 +93,23 @@ export default function Navbar() {
     setIsSidebarOpen(false);
   };
 
+  const pages = isLogin ? authPages : guestPages;
+
   return (
     <>
       <AppBar position="static" sx={{ backgroundColor: "#4FC4CA" }}>
         <Toolbar>
           {/* Logo Desktop */}
-          <Box component={Link} to="/" sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", mr: 2 }}>
-            <img src={logo} alt="Logo" style={{ height: 40, filter: "drop-shadow(0 0 3px rgba(0,0,0,0.5))" }} />
+          <Box
+            component={Link}
+            to="/"
+            sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", mr: 2 }}
+          >
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ height: 40, filter: "drop-shadow(0 0 3px rgba(0,0,0,0.5))" }}
+            />
           </Box>
 
           {/* Mobile Menu Icon */}
@@ -107,15 +125,10 @@ export default function Navbar() {
               transformOrigin={{ horizontal: "left", vertical: "top" }}
               anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
             >
-              {(isLogin ? authPages : guestPages).map((page, index) => (
-                <MenuItem
-                  key={typeof page === "string" ? page : page.name}
-                  component={typeof page === "string" ? "div" : Link}
-                  to={typeof page === "object" ? page.path : undefined}
-                  onClick={handleCloseNavMenu}
-                >
+              {pages.map(({ name, path }) => (
+                <MenuItem key={name} component={Link} to={path} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">
-                    {typeof page === "object" && page.name === "Cart" ? `Cart (${cartitem})` : typeof page === "string" ? page : page.name}
+                    {name === "Cart" ? `Cart (${cartitem})` : name}
                   </Typography>
                 </MenuItem>
               ))}
@@ -134,27 +147,55 @@ export default function Navbar() {
           </Box>
 
           {/* Logo Mobile */}
-          <Box component={Link} to="/" sx={{ flexGrow: 1, display: { xs: "flex", md: "none" }, justifyContent: "center", alignItems: "center" }}>
-            <img src={logo} alt="Logo" style={{ height: 40, filter: "drop-shadow(0 0 3px rgba(0,0,0,0.5))" }} />
+          <Box
+            component={Link}
+            to="/"
+            sx={{
+              flexGrow: 1,
+              display: { xs: "flex", md: "none" },
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ height: 40, filter: "drop-shadow(0 0 3px rgba(0,0,0,0.5))" }}
+            />
           </Box>
 
           {/* Desktop Buttons */}
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, justifyContent: "flex-end", alignItems: "center", gap: 2 }}>
-            {(isLogin ? authPages : guestPages).map((page, index) => (
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", md: "flex" },
+              justifyContent: "flex-end",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            {pages.map(({ name, path }) => (
               <Button
-                key={typeof page === "string" ? page : page.name}
-                component={typeof page === "string" ? "div" : Link}
-                to={typeof page === "object" ? page.path : undefined}
+                key={name}
+                component={Link}
+                to={path}
                 sx={{ color: "white", fontWeight: "bold", textTransform: "none" }}
               >
-                {typeof page === "object" && page.name === "Cart" ? `Cart (${cartitem})` : typeof page === "string" ? page : page.name}
+                {name === "Cart" ? `Cart (${cartitem})` : name}
               </Button>
             ))}
 
             {isLogin && (
               <Button
                 onClick={handleLogout}
-                sx={{ color: "white", fontWeight: "bold", textTransform: "none", border: "1px solid white", ml: 1, "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" } }}
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "none",
+                  border: "1px solid white",
+                  ml: 1,
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
+                }}
               >
                 Logout
               </Button>
@@ -169,7 +210,17 @@ export default function Navbar() {
             {isLogin && (
               <Tooltip title="Open settings">
                 <IconButton onClick={toggleSidebar} sx={{ p: 0, ml: 1 }}>
-                  <Avatar alt="User" src="/static/images/avatar/2.jpg" sx={{ width: 36, height: 36, border: "2px solid white", boxShadow: 3, cursor: "pointer" }} />
+                  <Avatar
+                    alt="User"
+                    src="/static/images/avatar/2.jpg"
+                    sx={{
+                      width: 36,
+                      height: 36,
+                      border: "2px solid white",
+                      boxShadow: 3,
+                      cursor: "pointer",
+                    }}
+                  />
                 </IconButton>
               </Tooltip>
             )}
@@ -177,13 +228,24 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
+      {/* Sidebar Drawer */}
       <Drawer
         anchor="right"
         open={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        PaperProps={{ sx: { width: 250, bgcolor: "background.paper", boxShadow: 3 } }}
+        PaperProps={{
+          sx: { width: 250, bgcolor: "background.paper", boxShadow: 3 },
+        }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", px: 2, pt: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            px: 2,
+            pt: 2,
+          }}
+        >
           <Typography variant="h6">Settings</Typography>
           <IconButton onClick={() => setIsSidebarOpen(false)} sx={{ fontSize: 20 }}>
             ✖
