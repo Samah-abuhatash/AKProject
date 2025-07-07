@@ -8,93 +8,60 @@ import Login from "./pages/login/Login";
 import Cart from "./pages/cart/Cart";
 import ForgetPassword from "./pages/forgentpassworld/Forgetpassworld";
 import Restcode from "./pages/forgentpassworld/Restcode";
-
 import Checkout from "./pages/checkout/Checkout";
 import Product from "./pages/Deatilesproudct/Proudct";
 import Protectedrouter from "./components/protectedrouter/Protectedrouter";
 import Homepage from "./pages/Homepage/Homepage";
 import Categoriespages from "./pages/categories/Categoriespages";
 import Proudctpages from "./pages/proudct/Proudctpages";
-import { ContactPage } from "@mui/icons-material";
 import Contactuspages from "./pages/contactus/Contactuspages";
 import Aboutuspages from "./pages/aboutus/Aboutuspages";
 
+// الصفحات الجديدة تحت /profile
+import Information from "./pages/ACount/Information";
+import ChangePassword from "./pages/ACount/ChangePassword";
+import Orders from "./pages/ACount/Orders";
 
 const route = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <MAINLAYOUT />,
     errorElement: <Error />,
     children: [
+      { path: "/", element: <Home /> },
+      { path: "/product/:id", element: <Product /> },
+      { path: "/shop", element: <Shop /> },
+      { path: "/register", element: <Reigster /> },
       {
-        path: '/',
-        element: <Home />,
+        path: "/checkout",
+        element: (
+          <Protectedrouter>
+            <Checkout />
+          </Protectedrouter>
+        ),
       },
-      ,
-       {
-        path: '/product/:id',
-        element:<Product/>
-      },
-        {
-        path: '/shop',
-        element: <Shop/>,
-      },
-        {
-        path: '/register',
-        element: <Reigster/>,
-      },
-      ,
-        {
-        path: '/checkout',
-        element:
-         <Protectedrouter>
-          <Checkout/>,
-         </Protectedrouter> 
-       
-      },
-        {
-        path: '/login',
-        element:<Login/>
-      },
-       {
-        path: '/cart',
-        element:
-        <Protectedrouter>
-         <Cart/>
-        </Protectedrouter>
-       
-      },
-       {
-        path: '/forgetpassworld',
-        element:<ForgetPassword/>
-      },
-       {
-        path: '/restcode',
-        element:<Restcode/>
-      },
-     {
-        path: '/home',
-        element: <Homepage/>,
-      },
-    {
-        path: '/categories',
-        element: < Categoriespages/>,
-      },
+      { path: "/login", element: <Login /> },
       {
-        path: '/products',
-        element: <Proudctpages/>,
+        path: "/cart",
+        element: (
+          <Protectedrouter>
+            <Cart />
+          </Protectedrouter>
+        ),
       },
-       {
-        path: '/aboutus',
-        element: <Aboutuspages/>,
-      },
-       {
-        path: '/contactus',
-        element: <Contactuspages/>,
-      },
+      { path: "/forgetpassworld", element: <ForgetPassword /> },
+      { path: "/restcode", element: <Restcode /> },
+      { path: "/home", element: <Homepage /> },
+      { path: "/categories", element: <Categoriespages /> },
+      { path: "/products", element: <Proudctpages /> },
+      { path: "/aboutus", element: <Aboutuspages /> },
+      { path: "/contactus", element: <Contactuspages /> },
+
+      // 🟩 صفحات البروفايل بشكل مباشر تحت /profile
+      { path: "/profile/info", element: <Information /> },
+      { path: "/profile/change-password", element: <ChangePassword /> },
+      { path: "/profile/orders", element: <Orders /> },
     ],
-    
-    
   },
 ]);
 
