@@ -208,18 +208,44 @@ function Product() {
   );
 }
 
-// ✅ مكون إضافة مراجعة
+// ✅ مكون إضافة مراجعة (بعد التعديل لمنع التكرار)
 function AddReview({ productId, onReviewAdded }) {
   const [rate, setRate] = useState(0);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [userReviewed, setUserReviewed] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    if (!token) return;
+
+    const checkIfReviewed = async () => {
+      try {
+        const res = await axiosaut.get(`products/${productId}`);
+        const product = res.data?.data || res.data;
+        const reviews = product.reviews || [];
+        const userId = JSON.parse(atob(token.split('.')[1]))["nameid"]; // أو حسب اسم الـ claim
+        const alreadyReviewed = reviews.some((r) => r.reviewerId === userId);
+        setUserReviewed(alreadyReviewed);
+      } catch (err) {
+        console.error("Error checking review status", err);
+      }
+    };
+
+    checkIfReviewed();
+  }, [productId]);
 
   const handleSubmit = async () => {
     const token = localStorage.getItem("userToken");
     if (!token) {
       setError("Please login to add a review.");
+      return;
+    }
+
+    if (userReviewed) {
+      setError("You have already reviewed this product.");
       return;
     }
 
@@ -235,21 +261,15 @@ function AddReview({ productId, onReviewAdded }) {
     try {
       await axiosaut.post(
         `products/${productId}/Reviews/Create`,
-        {
-          Rate: rate,
-          Comment: comment
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { Rate: rate, Comment: comment },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setSuccess("Review submitted successfully!");
+      setSuccess("✅ Review submitted successfully!");
       setRate(0);
       setComment('');
-      onReviewAdded(); // يعيد تحميل البيانات لتحديث المراجعات
+      setUserReviewed(true);
+      onReviewAdded(); // لتحديث العرض
     } catch (err) {
       console.error("Review error:", err);
       setError("Failed to submit review.");
@@ -260,39 +280,47 @@ function AddReview({ productId, onReviewAdded }) {
 
   return (
     <Box mt={5}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        Add a Review
-      </Typography>
+      {userReviewed ? (
+        <Typography variant="body1" color="primary" mt={2}>
+          ✅ You have already reviewed this product.
+        </Typography>
+      ) : (
+        <>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            Add a Review
+          </Typography>
 
-      {error && <Typography color="error">{error}</Typography>}
-      {success && <Typography color="primary">{success}</Typography>}
+          {error && <Typography color="error" mt={1}>{error}</Typography>}
+          {success && <Typography color="success.main" mt={1}>{success}</Typography>}
 
-      <Box mt={2}>
-        <Rating
-          value={rate}
-          onChange={(e, newValue) => setRate(newValue)}
-          precision={1}
-        />
-      </Box>
+          <Box mt={2}>
+            <Rating
+              value={rate}
+              onChange={(e, newValue) => setRate(newValue)}
+              precision={1}
+            />
+          </Box>
 
-      <TextField
-        label="Your comment"
-        multiline
-        fullWidth
-        rows={3}
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        sx={{ mt: 2 }}
-      />
+          <TextField
+            label="Your comment"
+            multiline
+            fullWidth
+            rows={3}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            sx={{ mt: 2 }}
+          />
 
-      <Button
-        variant="contained"
-        onClick={handleSubmit}
-        sx={{ mt: 2 }}
-        disabled={loading}
-      >
-        {loading ? "Submitting..." : "Submit Review"}
-      </Button>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            sx={{ mt: 2 }}
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit Review"}
+          </Button>
+        </>
+      )}
     </Box>
   );
 }
