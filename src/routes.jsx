@@ -13,11 +13,11 @@ import Product from "./pages/Deatilesproudct/Proudct";
 import Protectedrouter from "./components/protectedrouter/Protectedrouter";
 import Homepage from "./pages/Homepage/Homepage";
 import Categoriespages from "./pages/categories/Categoriespages";
-import Proudctpages from "./pages/proudct/Proudctpages";
+import Proudctpages from "./pages/Deatilesproudct/Proudct";
 import Contactuspages from "./pages/contactus/Contactuspages";
 import Aboutuspages from "./pages/aboutus/Aboutuspages";
 
-// الصفحات الجديدة تحت /profile
+
 import Information from "./pages/ACount/Information";
 import ChangePassword from "./pages/ACount/ChangePassword";
 import Orders from "./pages/ACount/Orders";
@@ -57,7 +57,7 @@ const route = createBrowserRouter([
       { path: "/aboutus", element: <Aboutuspages /> },
       { path: "/contactus", element: <Contactuspages /> },
 
-      // 🟩 صفحات البروفايل بشكل مباشر تحت /profile
+    
       { path: "/profile/info", element: <Information /> },
       { path: "/profile/change-password", element: <ChangePassword /> },
       { path: "/profile/orders", element: <Orders /> },

@@ -9,13 +9,13 @@ import {
   Stack,
   IconButton,
   Rating,
+  TextField,
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Cartcontext } from '../../components/context/Cartcontext.jsx';
 import axiosaut from '../../api/AxoisAuth';
-
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -25,21 +25,19 @@ function Product() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [isLoading, setLoading] = useState(true);
-
   const [selectedImage, setSelectedImage] = useState('');
   const [selectedColor, setSelectedColor] = useState(colors[0]);
   const [quantity, setQuantity] = useState(1);
   const [fav, setFav] = useState(false);
-
   const { cartitem, setcartitem } = useContext(Cartcontext);
 
   const getProduct = async () => {
     try {
       const response = await axiosaut.get(`products/${id}`);
-      setProduct(response.data);
-
-      const imgs = response.data.images || [];
-      setSelectedImage(imgs.length > 0 ? imgs[0] : response.data.mainImg);
+      const prod = response.data?.data || response.data;
+      setProduct(prod);
+      const imgs = prod.images || [];
+      setSelectedImage(imgs.length > 0 ? imgs[0] : prod.mainImg);
     } catch (error) {
       console.error("Error fetching product:", error);
       toast.error("Failed to load product.");
@@ -50,7 +48,6 @@ function Product() {
 
   const addtocart = async () => {
     if (!product) return;
-
     const userToken = localStorage.getItem("userToken");
     if (!userToken) {
       toast.info("Please login to add items to your cart.");
@@ -62,7 +59,6 @@ function Product() {
         `Carts/${product.id}`,
         { quantity, color: selectedColor }
       );
-
       setcartitem((prev) => prev + quantity);
       toast.success("Product added to cart!");
     } catch (error) {
@@ -71,17 +67,20 @@ function Product() {
     }
   };
 
-  // دوال فارغة لأزرار الزيادة والنقصان (لعدم التغيير فعلياً)
-  const noop = () => {};
-
   useEffect(() => {
     getProduct();
   }, [id]);
 
+  const noop = () => {};
+
   if (isLoading) return <Loader />;
 
   if (!product) {
-    return <Typography color="error">Failed to load product.</Typography>;
+    return (
+      <Typography color="error" align="center" mt={5}>
+        ❌ Failed to load product.
+      </Typography>
+    );
   }
 
   return (
@@ -89,17 +88,15 @@ function Product() {
       <Grid container spacing={4} sx={{ mb: 6, mt: 4, px: 2, maxWidth: 900, mx: 'auto' }}>
         <Grid item xs={12} md={7}>
           <Typography variant="h5" fontWeight="bold" gutterBottom>
-            {product.name}
+            {product.name || "Unnamed Product"}
           </Typography>
 
           <Typography variant="body2" color="text.secondary" mb={3} sx={{ lineHeight: 1.6 }}>
-            {product.description}
+            {product.description || "No description available."}
           </Typography>
 
           <Box display="flex" alignItems="center" mb={2}>
-            <Typography mr={1} fontWeight="bold">
-              Rate
-            </Typography>
+            <Typography mr={1} fontWeight="bold">Rate</Typography>
             <Rating
               name="rating"
               value={product.rating ?? 4}
@@ -108,7 +105,9 @@ function Product() {
               size="small"
             />
             <Typography ml={1} color="text.secondary">
-              {product.rating ?? 4} ({product.reviews ?? 100} reviews)
+              {product.rating ?? 4} (
+              {Array.isArray(product.reviews) ? product.reviews.length : 0} reviews
+              )
             </Typography>
           </Box>
 
@@ -136,18 +135,13 @@ function Product() {
           </Box>
 
           <Typography variant="h6" fontWeight="bold" mb={3}>
-            Price: ${product.price.toFixed(2)}
+            Price: ${typeof product.price === 'number' ? product.price.toFixed(2) : 'N/A'}
           </Typography>
 
           <Stack direction="row" spacing={2} alignItems="center" mb={3}>
-            {/* أزرار + و – فقط للعرض */}
-            <Button variant="outlined" onClick={noop} sx={{ minWidth: 36 }}>
-              –
-            </Button>
+            <Button variant="outlined" onClick={noop} sx={{ minWidth: 36 }}>–</Button>
             <Typography>{quantity}</Typography>
-            <Button variant="outlined" onClick={noop} sx={{ minWidth: 36 }}>
-              +
-            </Button>
+            <Button variant="outlined" onClick={noop} sx={{ minWidth: 36 }}>+</Button>
 
             <Button
               variant="contained"
@@ -165,7 +159,7 @@ function Product() {
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
-            Quantity in stock: {product.quantity}
+            Quantity in stock: {product.quantity ?? 0}
           </Typography>
 
           {product.discount > 0 && (
@@ -173,6 +167,28 @@ function Product() {
               Discount: {product.discount}%
             </Typography>
           )}
+
+          {/* ✅ عرض المراجعات */}
+          {Array.isArray(product.reviews) && product.reviews.length > 0 && (
+            <>
+              <Typography variant="h6" fontWeight="bold" mt={5} mb={2}>
+                Customer Reviews
+              </Typography>
+              {product.reviews.map((review) => (
+                <Box key={review.id} sx={{ mb: 3, p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
+                  <Typography fontWeight="bold">{review.reviewerName}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {new Date(review.reviewDate).toLocaleDateString()}
+                  </Typography>
+                  <Rating value={review.rate} precision={0.5} readOnly size="small" />
+                  <Typography mt={1}>{review.comment}</Typography>
+                </Box>
+              ))}
+            </>
+          )}
+
+          {/* ✅ نموذج إضافة مراجعة */}
+          <AddReview productId={product.id} onReviewAdded={getProduct} />
         </Grid>
       </Grid>
 
@@ -189,6 +205,95 @@ function Product() {
         theme="colored"
       />
     </>
+  );
+}
+
+// ✅ مكون إضافة مراجعة
+function AddReview({ productId, onReviewAdded }) {
+  const [rate, setRate] = useState(0);
+  const [comment, setComment] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      setError("Please login to add a review.");
+      return;
+    }
+
+    if (rate === 0 || comment.trim() === '') {
+      setError("Please add a rating and a comment.");
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      await axiosaut.post(
+        `products/${productId}/Reviews/Create`,
+        {
+          Rate: rate,
+          Comment: comment
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      setSuccess("Review submitted successfully!");
+      setRate(0);
+      setComment('');
+      onReviewAdded(); // يعيد تحميل البيانات لتحديث المراجعات
+    } catch (err) {
+      console.error("Review error:", err);
+      setError("Failed to submit review.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Box mt={5}>
+      <Typography variant="h6" fontWeight="bold" gutterBottom>
+        Add a Review
+      </Typography>
+
+      {error && <Typography color="error">{error}</Typography>}
+      {success && <Typography color="primary">{success}</Typography>}
+
+      <Box mt={2}>
+        <Rating
+          value={rate}
+          onChange={(e, newValue) => setRate(newValue)}
+          precision={1}
+        />
+      </Box>
+
+      <TextField
+        label="Your comment"
+        multiline
+        fullWidth
+        rows={3}
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        sx={{ mt: 2 }}
+      />
+
+      <Button
+        variant="contained"
+        onClick={handleSubmit}
+        sx={{ mt: 2 }}
+        disabled={loading}
+      >
+        {loading ? "Submitting..." : "Submit Review"}
+      </Button>
+    </Box>
   );
 }
 

@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -14,16 +13,19 @@ import {
   Drawer,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   Divider,
+  FormControl,
+  Select,
+  InputLabel,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { DarkMode, LightMode } from "@mui/icons-material";
 import { ThemeContextCustom } from "../context/Themecontext";
 import { Cartcontext } from "../context/Cartcontext";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo/logo1.png";
 
-// ✅ كلا القائمتين بصيغة name + path
 const guestPages = [
   { name: "Home", path: "/" },
   { name: "Categories", path: "/categories" },
@@ -43,17 +45,16 @@ const authPages = [
   { name: "Cart", path: "/cart" },
 ];
 
-// Sidebar items
 const sidebarSettings = [
-  { name: "Info" },
-  { name: "Change Password" },
-  { name: "Orders" },
-  { name: "Logout" },
+  { name: "Info", path: "/profile/info" },
+  { name: "Change Password", path: "/profile/change-password" },
+  { name: "Orders", path: "/profile/orders" },
+  { name: "Logout", action: "logout" },
 ];
 
 export default function Navbar() {
   const { cartitem } = useContext(Cartcontext);
-  const { toggleTheme, mode } = useContext(ThemeContextCustom);
+  const { mode, setMode, toggleTheme } = useContext(ThemeContextCustom);
   const isLogin = Boolean(localStorage.getItem("userToken"));
   const navigate = useNavigate();
 
@@ -63,43 +64,34 @@ export default function Navbar() {
   const handleOpenNavMenu = (event) => setAnchorElNav(event.currentTarget);
   const handleCloseNavMenu = () => setAnchorElNav(null);
 
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+
   const handleLogout = () => {
     localStorage.removeItem("userToken");
     navigate("/login");
     setIsSidebarOpen(false);
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
-  };
-
-  const handleSidebarNavigation = (name) => {
-    switch (name) {
-      case "Info":
-        navigate("/profile/info");
-        break;
-      case "Change Password":
-        navigate("/profile/change-password");
-        break;
-      case "Orders":
-        navigate("/profile/orders");
-        break;
-      case "Logout":
-        handleLogout();
-        break;
-      default:
-        break;
+  const handleSidebarNavigation = (item) => {
+    if (item.action === "logout") {
+      handleLogout();
+    } else {
+      navigate(item.path);
+      setIsSidebarOpen(false);
     }
-    setIsSidebarOpen(false);
   };
 
   const pages = isLogin ? authPages : guestPages;
+
+  const handleThemeChange = (event) => {
+    setMode(event.target.value);
+  };
 
   return (
     <>
       <AppBar position="static" sx={{ backgroundColor: "#4FC4CA" }}>
         <Toolbar>
-          {/* Logo Desktop */}
+          {/* شعار الديسكتوب */}
           <Box
             component={Link}
             to="/"
@@ -112,7 +104,7 @@ export default function Navbar() {
             />
           </Box>
 
-          {/* Mobile Menu Icon */}
+          {/* أيقونة قائمة الموبايل */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton size="large" onClick={handleOpenNavMenu} color="inherit">
               <MenuIcon />
@@ -133,6 +125,19 @@ export default function Navbar() {
                 </MenuItem>
               ))}
 
+              {/* زر تبديل الثيم داخل الموبايل */}
+              <MenuItem
+                onClick={() => {
+                  toggleTheme();
+                  handleCloseNavMenu();
+                }}
+                sx={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
+              >
+                <Typography>
+                  {mode === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+                </Typography>
+              </MenuItem>
+
               {isLogin && (
                 <MenuItem
                   onClick={() => {
@@ -146,7 +151,7 @@ export default function Navbar() {
             </Menu>
           </Box>
 
-          {/* Logo Mobile */}
+          {/* شعار الموبايل */}
           <Box
             component={Link}
             to="/"
@@ -164,7 +169,7 @@ export default function Navbar() {
             />
           </Box>
 
-          {/* Desktop Buttons */}
+          {/* أزرار الديسكتوب + اختيار الثيم + دروار المستخدم */}
           <Box
             sx={{
               flexGrow: 1,
@@ -201,14 +206,32 @@ export default function Navbar() {
               </Button>
             )}
 
-            <Tooltip title="Toggle Theme">
-              <IconButton onClick={toggleTheme} color="inherit">
-                {mode === "light" ? <DarkMode /> : <LightMode />}
-              </IconButton>
-            </Tooltip>
+            {/* اختيار الثيم في الديسكتوب */}
+            <FormControl sx={{ minWidth: 120 }} size="small">
+              <InputLabel sx={{ color: "white" }} id="theme-select-label">
+                Theme
+              </InputLabel>
+              <Select
+                labelId="theme-select-label"
+                value={mode}
+                label="Theme"
+                onChange={handleThemeChange}
+                sx={{
+                  color: "white",
+                  ".MuiOutlinedInput-notchedOutline": { borderColor: "white" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
+                  ".MuiSvgIcon-root": { color: "white" },
+                }}
+              >
+                <MenuItem value="light">Light</MenuItem>
+                <MenuItem value="dark">Dark</MenuItem>
+                <MenuItem value="system">System</MenuItem>
+              </Select>
+            </FormControl>
 
+            {/* أيقونة دروار المستخدم */}
             {isLogin && (
-              <Tooltip title="Open settings">
+              <Tooltip title="User Settings">
                 <IconButton onClick={toggleSidebar} sx={{ p: 0, ml: 1 }}>
                   <Avatar
                     alt="User"
@@ -228,7 +251,7 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
-      {/* Sidebar Drawer */}
+      {/* درّوار المستخدم */}
       <Drawer
         anchor="right"
         open={isSidebarOpen}
@@ -253,9 +276,11 @@ export default function Navbar() {
         </Box>
         <Divider />
         <List>
-          {sidebarSettings.map(({ name }) => (
-            <ListItem button key={name} onClick={() => handleSidebarNavigation(name)}>
-              <ListItemText primary={name} />
+          {sidebarSettings.map((item) => (
+            <ListItem key={item.name} disablePadding>
+              <ListItemButton onClick={() => handleSidebarNavigation(item)}>
+                <ListItemText primary={item.name} />
+              </ListItemButton>
             </ListItem>
           ))}
         </List>
